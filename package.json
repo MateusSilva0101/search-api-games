@@ -1,0 +1,24 @@
+{
+  "name": "search-api-games",
+  "version": "1.0.0",
+  "description": "Consumindo uma API de jogos e exibindo os jogos favoritos e, ao clicar em um jogo, visualizar os jogos relacionados a ele.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MateusSilva0101/search-api-games.git"
+  },
+  "keywords": [
+    "api",
+    "javascript",
+    "nodejs"
+  ],
+  "author": "Mateus Silva",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MateusSilva0101/search-api-games/issues"
+  },
+  "homepage": "https://github.com/MateusSilva0101/search-api-games#readme"
+}
