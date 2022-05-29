@@ -1,6 +1,6 @@
-function getGamesByName (name, callback) {
+function getGamesByName (name, callback) {  
     let request = new XMLHttpRequest();
-    request.open('GET', `https://api.rawg.io/api/games?key=8f68b0ecd134487d938e65fe4f35c401&search=${name}`, true);
+    request.open('GET', `https://api.rawg.io/api/games?key=${CHAVE_API}&search=${name}`, true);
     //console.log(request);
     request.onload = () => {
         let response = JSON.parse(request.response);
