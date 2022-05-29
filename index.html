@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Games</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="center-align">
+            <!-- <img src="./img/logo.svg" alt="Hcode Treinamentos"> -->
+            <h2>Game Search Application</h2>
+        </header>
+
+        <div class="row">
+            <div class="input-field col s12">
+                <i class="material-icons prefix">videogame_asset</i>
+                <input id="search-game" type="text">
+                <label for="search-game">Digite um jogo</label>
+            </div>
+        </div>
+
+        <div class="games">
+            <h4>Jogos</h4>
+            <div class="games-list" id="games-list-principal"></div>
+            <hr>
+            <h4>Jogos Relacionados</h4>
+            <div id="games-relationed" class="games-list"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="js/requests-promises.js"></script>
+    <script>
+        const gamesListPrincipal = document.querySelector('#games-list-principal');
+        const gamesListRelationed = document.querySelector('#games-relationed');
+
+        function setGameLoad(gameEl) {
+            gameEl.innerHTML = `
+                <div class="preloader-wrapper active" style="position: absolute; left: 50%; margin-top: 30px">
+                    <div class="spinner-layer spinner-blue-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+            
+            `;
+        };
+
+        function setGameHTML(game) {
+            let div = document.createElement('div');
+            div.dataset.gamename = game.slug;
+            div.className = 'item';
+            div.innerHTML = `
+                <div class="card">
+                    <div class="card-image">
+                        <img src="${game.background_image}" />
+                    </div>
+                    <div class="card-content">
+                        <p>
+                            <h5>${game.name}</h5> (${game.released})
+                        </p>
+                    </div>
+                </div>
+            `;
+            return div;
+        };
+
+        function initGames(gamename) {
+            setGameLoad(gamesListPrincipal);
+            getGamesByName(gamename, function(games) {
+                gamesListPrincipal.innerHTML = '';
+                games.results.forEach(game => {
+                    let divGame = setGameHTML(game);
+                    //
+                    gamesListPrincipal.append(divGame);
+                }) ;
+            });
+        };
+
+        document.querySelector('[type=text]').addEventListener('blur', e => {
+            initGames(e.target.value);
+        });
+    </script>
+</body>
+</html>
