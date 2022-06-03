@@ -1,18 +1,20 @@
-//Constantes que aramazenará os jogos principais e os relacionados
+//Aramazena os jogos principais e os relacionados
 const gamesListPrincipal = document.querySelector('#games-list-principal');
 const gamesListRelationed = document.querySelector('#games-relationed');
 
-const  getGamesByName = (name, callback) => {  
-    let request = new XMLHttpRequest();
-    request.open('GET', `https://api.rawg.io/api/games?key=${chaveapi}&search=${name}`, true);
-    console.log(request);
-
-    request.onload = () => {
-        let response = JSON.parse(request.response);
-        console.log(response);
-        if(typeof callback == 'function') callback(response);
-    };
-    request.send();
+//Função que nos retorna uma promise
+const  getGamesByName = (name) => {  
+    return new Promise((resolve, reject) => {
+        fetch(`https://api.rawg.io/api/games?key=${chave_api}&search=${name}`)
+        //Converte a resposta do servidor para JSON
+        .then(res => res.json())
+        .then(data => {
+            resolve(data);
+        })
+        .catch(err => {
+            reject(err);
+        });
+    });
 };
 
  //Função que adiciona um elemento de loading antes de exibir os dados da API
@@ -34,6 +36,7 @@ const  getGamesByName = (name, callback) => {
      `;
  };
 
+ //Função que seta as informações do game numa div 
  const setGameHTML = (game) => {
      let div = document.createElement('div');
      div.dataset.gamename = game.slug;
@@ -53,14 +56,43 @@ const  getGamesByName = (name, callback) => {
      return div;
  };
 
+ //Função que inicia as outras funções
  const initGames = (gamename) => {
-     setGameLoad(gamesListPrincipal);
-     getGamesByName(gamename, (games) => {
+    setGameLoad(gamesListPrincipal);
+
+    gamesListRelationed.innerHTML = '';
+
+     getGamesByName(gamename).then(games => {
          gamesListPrincipal.innerHTML = '';
-         games.results.forEach(game => {
-             let divGame = setGameHTML(game);
+
+         games.results.forEach(game => {   
+            let divGame = setGameHTML(game);
+
+            //Evento que ao clicar em jogo, exibe os jogos relacionados
+            divGame.addEventListener('click', e => {
+                setGameLoad(gamesListRelationed);
+
+                //adicionamos um ouvinte do evento clique em cada elemento de jogo criado
+                let gameTag = e.currentTarget;
+
+                //recuperar o nome do jogo que clicamos 
+                let gamename = gameTag.dataset.gamename;
+
+                getRelatedGamesByName(gamename).then(gamesRelationed => {
+
+                    //remover o conteúdo da <div> que vai conter os novos jogos
+                    gamesListRelationed.innerHTML = '';
+
+                    //percorre os resultados da API e cria um HTML de cada jogo relacionado
+                    gamesRelationed.results.forEach(game => {
+                        let divGameRelationed = setGameHTML(game);
+
+                        gamesListRelationed.append(divGameRelationed);
+                    });
+                });
+            });
              gamesListPrincipal.append(divGame);
-         }) ;
+        });
      });
  };
 
@@ -68,3 +100,17 @@ const  getGamesByName = (name, callback) => {
  document.querySelector('[type=text]').addEventListener('blur', e => {
      initGames(e.target.value);
  });
+
+ //Buscando os dados dos jogos relacionados 
+ function getRelatedGamesByName(name) {
+    return new Promise((resolve, reject) => {
+        fetch(`https://api.rawg.io/api/games?key=${chave_api}&search=${name}/suggested`)
+        .then(res => res.json())
+        .then(data => {
+            resolve(data);
+        })
+        .catch(err => {
+            reject(err);
+        })   
+    });
+};
